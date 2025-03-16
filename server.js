@@ -1,0 +1,41 @@
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import connectDB from "./utils/db.js";
+import userRoutes from "./routes/userRoutes.js";
+
+dotenv.config();
+
+const app = express();
+
+// Body parser middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const PORT = process.env.PORT || 3000;
+
+const corsOptions = {
+  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+
+// Connect to MongoDB
+connectDB();
+
+// Routes
+app.use('/api/v1/users', userRoutes);
+
+// Basic route
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to the API' });
+});
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
