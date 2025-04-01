@@ -48,3 +48,4 @@ build/
 # Miscellaneous
 coverage/
 .nyc_output/
+.gitpod.yml
