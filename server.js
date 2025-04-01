@@ -5,6 +5,9 @@ import passport from "passport";
 import connectDB from "./utils/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import axios from "axios"
+import getZohoAccessToken from "./utils/zoho_auth.js"
+import exphbs from "express-handlebars"
 
 dotenv.config();
 
@@ -13,6 +16,9 @@ const app = express();
 // Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Set up Handlebars view engine
+app.engine('handlebars', exphbs());
+app.set('view engine', 'handlebars');
 
 // Initialize Passport
 app.use(passport.initialize());
@@ -35,6 +41,24 @@ connectDB();
 // Routes
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/auth', authRoutes);
+
+app.get('/api/customers', async (req, res) => {
+  try {
+      const accessToken = await getZohoAccessToken();
+
+      const response = await axios.get(`https://www.zohoapis.com/subscriptions/v1/customers`, {
+          headers: {
+              Authorization: `Zoho-oauthtoken ${accessToken}`,
+              'X-com-zoho-subscriptions-organizationid': process.env.ZOHO_ORG_ID,
+          },
+      });
+
+      res.json(response.data);
+  } catch (error) {
+      console.error('Error fetching customers:', error.response?.data || error.message);
+      res.status(500).json({ error: 'Failed to fetch customers' });
+  }
+});
 
 // Basic route
 app.get('/', (req, res) => {

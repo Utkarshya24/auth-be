@@ -1,0 +1,22 @@
+<!-- views/customers.handlebars -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoho Customers</title>
+</head>
+<body>
+    <h1>Zoho Customers</h1>
+    {{#if customers.length}}
+        <ul>
+            {{#each customers}}
+                <li>{{this.display_name}}</li>
+            {{/each}}
+        </ul>
+    {{else}}
+        <p>No customers found.</p>
+    {{/if}}
+</body>
+</html>
+
